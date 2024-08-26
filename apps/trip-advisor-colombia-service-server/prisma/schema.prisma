@@ -1,0 +1,119 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  createdAt     DateTime       @default(now())
+  email         String?        @unique
+  firstName     String?
+  id            String         @id @default(auto()) @map("_id") @db.ObjectId
+  lastName      String?
+  notifications Notification[]
+  password      String
+  roles         Json
+  updatedAt     DateTime       @updatedAt
+  username      String         @unique
+}
+
+model Review {
+  createdAt        DateTime @default(now())
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  images           Json?
+  rating           Int?
+  reviewedBy       String?
+  reviewedCategory String?
+  reviewedEvent    String?
+  text             String?
+  updatedAt        DateTime @updatedAt
+}
+
+model Category {
+  createdAt   DateTime @default(now())
+  description String?
+  events      Event[]
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  isActive    Boolean?
+  name        String?
+  updatedAt   DateTime @updatedAt
+}
+
+model Event {
+  category    Category? @relation(fields: [categoryId], references: [id])
+  categoryId  String?   @db.ObjectId
+  city        City?     @relation(fields: [cityId], references: [id])
+  cityId      String?   @db.ObjectId
+  createdAt   DateTime  @default(now())
+  createdBy   String?
+  date        DateTime?
+  description String?
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  location    String?
+  manager     String?
+  title       String?
+  updatedAt   DateTime  @updatedAt
+}
+
+model Notification {
+  createdAt DateTime @default(now())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  message   String?
+  typeField String?
+  updatedAt DateTime @updatedAt
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    String?  @db.ObjectId
+}
+
+model ApplicationUser {
+  createdAt DateTime                     @default(now())
+  email     String?
+  id        String                       @id @default(auto()) @map("_id") @db.ObjectId
+  password  String?
+  role      String?
+  updatedAt DateTime                     @updatedAt
+  userRole  EnumApplicationUserUserRole?
+  username  String?
+}
+
+model UserRole {
+  createdAt   DateTime @default(now())
+  description String?
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String?
+  updatedAt   DateTime @updatedAt
+}
+
+model EventManager {
+  city        City?                      @relation(fields: [cityId], references: [id])
+  cityId      String?                    @db.ObjectId
+  contactInfo String?
+  createdAt   DateTime                   @default(now())
+  id          String                     @id @default(auto()) @map("_id") @db.ObjectId
+  isActive    Boolean?
+  name        String?
+  typeField   EnumEventManagerTypeField?
+  updatedAt   DateTime                   @updatedAt
+}
+
+model City {
+  createdAt     DateTime       @default(now())
+  description   String?
+  eventManagers EventManager[]
+  events        Event[]
+  id            String         @id @default(auto()) @map("_id") @db.ObjectId
+  isActive      Boolean?
+  name          String?
+  updatedAt     DateTime       @updatedAt
+}
+
+enum EnumApplicationUserUserRole {
+  Option1
+}
+
+enum EnumEventManagerTypeField {
+  Option1
+}
